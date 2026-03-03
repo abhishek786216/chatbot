@@ -1,0 +1,72 @@
+🏥 DISASTER MANAGEMENT RAG CHATBOT - QUICK REFERENCE
+=====================================================
+
+📂 PROJECT FILES
+-----------------
+✅ light_rag_chatbot.py  - Main RAG chatbot application
+✅ start.bat             - Quick start script (double-click to run)
+✅ requirements.txt      - Python dependencies
+✅ README.md             - Full documentation
+
+📁 DIRECTORIES
+--------------
+✅ templates/   - HTML interface files
+✅ static/      - CSS, JavaScript, images
+✅ uploads/     - Uploaded PDF storage
+✅ rag_data/    - RAG system data storage
+
+🚀 HOW TO START
+-----------------
+1. Double-click: start.bat
+   OR
+2. Run: python light_rag_chatbot.py
+
+🌐 ACCESS POINTS
+-----------------
+User Chat:   http://localhost:5001
+Admin Panel: http://localhost:5001/admin
+
+✨ REMOVED FILES (Cleanup Complete)
+------------------------------------
+❌ enhanced_chatbot.py    - Replaced by light_rag_chatbot.py
+❌ rag_system.py          - No longer needed
+❌ simple_chatbot.py      - Redundant
+❌ web_chatbot.py         - Redundant
+❌ chatbot.py             - Redundant
+❌ diagnose.py            - Testing utility
+❌ test_api.py            - Testing utility
+❌ system_test.py         - Testing utility
+❌ launch.py              - Old menu launcher
+❌ start_chatbot.bat      - Old startup script
+❌ restart_system.bat     - Old restart script
+❌ IMPLEMENTATION_SUMMARY.md - Old documentation
+❌ __pycache__/           - Python cache
+
+🎯 CURRENT STATUS
+-----------------
+✅ Clean, minimal project structure
+✅ Only essential files kept
+✅ Single working RAG system
+✅ Updated documentation
+✅ Ready for production use
+
+📊 SYSTEM CAPABILITIES
+----------------------
+✅ PDF document upload and processing
+✅ Intelligent keyword-based search
+✅ RAG-enhanced responses
+✅ Admin panel for content management
+✅ Emergency contacts storage
+✅ Disaster management focus only
+✅ Persistent knowledge base
+
+🔄 NEXT STEPS
+--------------
+1. Start the chatbot: start.bat
+2. Access admin panel: http://localhost:5001/admin
+3. Upload disaster management PDFs
+4. Start chatting with RAG-enhanced AI!
+
+=====================================================
+Last Updated: March 3, 2026
+Version: Light RAG System v1.0

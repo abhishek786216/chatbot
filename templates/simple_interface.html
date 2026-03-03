@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Disaster Management Chatbot</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 15px 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        
+        .header h1 {
+            color: #dc3545;
+            font-size: 1.8em;
+        }
+        
+        .container {
+            display: flex;
+            flex: 1;
+            max-width: 1200px;
+            margin: 20px auto;
+            gap: 20px;
+            padding: 0 20px;
+            width: 100%;
+        }
+        
+        .chat-section {
+            flex: 2;
+            display: flex;
+            flex-direction: column;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .sidebar {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            min-width: 280px;
+        }
+        
+        .chat-header {
+            background: linear-gradient(135deg, #dc3545, #c82333);
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        .quick-actions {
+            padding: 15px;
+            background: #f8f9fa;
+            border-bottom: 1px solid #dee2e6;
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        
+        .quick-btn {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 15px;
+            cursor: pointer;
+            font-size: 13px;
+            transition: all 0.3s;
+        }
+        
+        .quick-btn:hover {
+            background: #0056b3;
+            transform: translateY(-1px);
+        }
+        
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            max-height: 400px;
+        }
+        
+        .message {
+            margin-bottom: 15px;
+            padding: 12px;
+            border-radius: 10px;
+            max-width: 85%;
+        }
+        
+        .user-message {
+            background: #007bff;
+            color: white;
+            margin-left: auto;
+        }
+        
+        .bot-message {
+            background: #f1f3f4;
+            color: #333;
+        }
+        
+        .chat-input {
+            padding: 15px;
+            border-top: 1px solid #dee2e6;
+            display: flex;
+            gap: 10px;
+        }
+        
+        #messageInput {
+            flex: 1;
+            padding: 10px;
+            border: 2px solid #dee2e6;
+            border-radius: 20px;
+            font-size: 16px;
+        }
+        
+        #messageInput:focus {
+            border-color: #007bff;
+            outline: none;
+        }
+        
+        .send-btn {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+        
+        .send-btn:hover {
+            background: #0056b3;
+        }
+        
+        .send-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        
+        .sidebar-card {
+            background: white;
+            border-radius: 10px;
+            padding: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .sidebar-card h3 {
+            color: #dc3545;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+        
+        .emergency-btn {
+            width: 100%;
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 8px;
+            transition: background-color 0.3s;
+        }
+        
+        .emergency-btn:hover {
+            background: #c82333;
+        }
+        
+        .contact-item {
+            background: #f8f9fa;
+            padding: 8px;
+            border-radius: 5px;
+            margin-bottom: 5px;
+            font-size: 14px;
+            border-left: 3px solid #007bff;
+        }
+        
+        .status-indicator {
+            padding: 8px 12px;
+            border-radius: 5px;
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+        
+        .status-online {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .status-simple {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+        
+        .typing {
+            opacity: 0.7;
+            font-style: italic;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+                margin: 10px;
+                gap: 10px;
+            }
+            
+            .sidebar {
+                min-width: auto;
+            }
+            
+            .message {
+                max-width: 95%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🏥 Disaster Management Assistant</h1>
+        <p>Emergency Response & Safety Guidance</p>
+    </div>
+    
+    <div class="container">
+        <!-- Chat Section -->
+        <div class="chat-section">
+            <div class="chat-header">
+                <h2>🤖 Emergency Response Helper</h2>
+                <p>Ask about emergency procedures and disaster preparedness</p>
+            </div>
+            
+            <div class="quick-actions">
+                <button class="quick-btn" onclick="sendQuickMessage('Fire emergency procedures')">🔥 Fire</button>
+                <button class="quick-btn" onclick="sendQuickMessage('Earthquake safety steps')">🌍 Earthquake</button>
+                <button class="quick-btn" onclick="sendQuickMessage('Flood evacuation guide')">🌊 Flood</button>
+                <button class="quick-btn" onclick="sendQuickMessage('Emergency kit checklist')">🎒 Kit</button>
+                <button class="quick-btn" onclick="sendQuickMessage('First aid basics')">🩹 First Aid</button>
+                <button class="quick-btn" onclick="clearConversation()">🗑️ Clear</button>
+            </div>
+            
+            <div class="chat-messages" id="chatMessages">
+                <div class="message bot-message">
+                    <strong>🤖 Assistant:</strong> Hello! I'm your disaster management assistant. I can help you with emergency procedures, safety protocols, and disaster preparedness. Ask me about fire safety, earthquake response, flood procedures, or any other emergency topic.
+                </div>
+            </div>
+            
+            <div class="chat-input">
+                <input 
+                    type="text" 
+                    id="messageInput" 
+                    placeholder="Ask about emergency procedures or safety tips..."
+                    onkeypress="handleKeyPress(event)"
+                />
+                <button class="send-btn" onclick="sendMessage()" id="sendBtn">
+                    Send
+                </button>
+            </div>
+        </div>
+        
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <!-- Status -->
+            <div class="sidebar-card">
+                <div class="status-indicator status-simple">
+                    ⚡ Simple Mode - No RAG system required
+                </div>
+                <p style="font-size: 14px; color: #666;">This version works without complex dependencies and provides emergency guidance using AI.</p>
+            </div>
+            
+            <!-- Emergency Actions -->
+            <div class="sidebar-card">
+                <h3>🚨 Emergency</h3>
+                <button class="emergency-btn" onclick="callEmergency('911')">
+                    📞 Call 911
+                </button>
+                <button class="emergency-btn" onclick="shareLocation()" style="background: #fd7e14;">
+                    📍 Share Location
+                </button>
+            </div>
+            
+            <!-- Emergency Contacts -->
+            <div class="sidebar-card">
+                <h3>☎️ Contacts</h3>
+                <div id="emergencyContacts">
+                    <div class="contact-item">
+                        <strong>Emergency Services</strong><br>
+                        📞 911 - Fire, Police, Medical
+                    </div>
+                    <div class="contact-item">
+                        <strong>Poison Control</strong><br>
+                        📞 1-800-222-1222
+                    </div>
+                    <div class="contact-item">
+                        <strong>Red Cross</strong><br>
+                        📞 1-800-RED-CROSS
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Quick Tips -->
+            <div class="sidebar-card">
+                <h3>💡 Quick Tips</h3>
+                <div style="font-size: 14px;">
+                    <p><strong>🔥 Fire:</strong> Get low, check doors, exit quickly</p>
+                    <p><strong>🌍 Earthquake:</strong> Drop, Cover, Hold On</p>
+                    <p><strong>🌊 Flood:</strong> Turn Around, Don't Drown</p>
+                    <p><strong>⛈️ Storm:</strong> Stay indoors, away from windows</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const chatMessages = document.getElementById('chatMessages');
+        const messageInput = document.getElementById('messageInput');
+        const sendBtn = document.getElementById('sendBtn');
+        const sessionId = 'session_' + Date.now();
+        
+        function addMessage(content, isUser = false) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${isUser ? 'user-message' : 'bot-message'}`;
+            messageDiv.innerHTML = `<strong>${isUser ? '👤 You' : '🤖 Assistant'}:</strong> ${content}`;
+            chatMessages.appendChild(messageDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+        
+        function addTypingIndicator() {
+            const typingDiv = document.createElement('div');
+            typingDiv.className = 'message bot-message typing';
+            typingDiv.id = 'typing';
+            typingDiv.innerHTML = '<strong>🤖 Assistant:</strong> typing...';
+            chatMessages.appendChild(typingDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+        
+        function removeTypingIndicator() {
+            const typingElement = document.getElementById('typing');
+            if (typingElement) {
+                typingElement.remove();
+            }
+        }
+        
+        async function sendMessage() {
+            const message = messageInput.value.trim();
+            if (!message) return;
+            
+            addMessage(message, true);
+            messageInput.value = '';
+            sendBtn.disabled = true;
+            addTypingIndicator();
+            
+            try {
+                const response = await fetch('/chat', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        message: message,
+                        session_id: sessionId
+                    })
+                });
+                
+                const data = await response.json();
+                
+                removeTypingIndicator();
+                
+                if (data.success) {
+                    addMessage(data.response);
+                } else {
+                    addMessage(`❌ ${data.error}`);
+                }
+                
+            } catch (error) {
+                removeTypingIndicator();
+                addMessage(`❌ Connection error. For emergencies, call 911 directly.`);
+            }
+            
+            sendBtn.disabled = false;
+            messageInput.focus();
+        }
+        
+        function sendQuickMessage(message) {
+            messageInput.value = message;
+            sendMessage();
+        }
+        
+        async function clearConversation() {
+            try {
+                await fetch('/clear_conversation', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        session_id: sessionId
+                    })
+                });
+                
+                chatMessages.innerHTML = `
+                    <div class="message bot-message">
+                        <strong>🤖 Assistant:</strong> Conversation cleared! How can I help you with emergency preparedness?
+                    </div>
+                `;
+                
+            } catch (error) {
+                console.error('Error clearing conversation:', error);
+            }
+        }
+        
+        function handleKeyPress(event) {
+            if (event.key === 'Enter' && !sendBtn.disabled) {
+                sendMessage();
+            }
+        }
+        
+        function callEmergency(number) {
+            if (confirm(`Call ${number} for emergency assistance?`)) {
+                window.location.href = `tel:${number}`;
+            }
+        }
+        
+        function shareLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    function(position) {
+                        const location = `Lat: ${position.coords.latitude}, Lng: ${position.coords.longitude}`;
+                        if (navigator.share) {
+                            navigator.share({
+                                title: 'Emergency Location',
+                                text: `My emergency location: ${location}`,
+                                url: `https://maps.google.com/?q=${position.coords.latitude},${position.coords.longitude}`
+                            });
+                        } else {
+                            navigator.clipboard.writeText(location);
+                            alert('Location copied to clipboard: ' + location);
+                        }
+                    },
+                    function(error) {
+                        alert('Could not get location. Enable location services and try again.');
+                    }
+                );
+            } else {
+                alert('Geolocation not supported by this browser');
+            }
+        }
+        
+        // Focus on input when page loads
+        messageInput.focus();
+    </script>
+</body>
+</html>

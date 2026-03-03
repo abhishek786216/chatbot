@@ -1,0 +1,1158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Disaster Management Chatbot</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        }
+        
+        body {
+            background-color: #f4f6f8;
+            color: #1a202c;
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .header {
+            background: #ffffff;
+            padding: 16px 32px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05), 0 1px 2px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #e2e8f0;
+            flex-shrink: 0;
+        }
+        
+        .header h1 {
+            color: #e53e3e;
+            font-size: 1.5rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 12px;
+        }
+        
+        .nav-links a {
+            color: #4a5568;
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-weight: 500;
+            font-size: 0.95rem;
+            transition: all 0.2s ease;
+            background: #f7fafc;
+            border: 1px solid #e2e8f0;
+        }
+        
+        .nav-links a:hover {
+            background-color: #edf2f7;
+            color: #2d3748;
+        }
+        
+        .main-container {
+            display: flex;
+            flex: 1;
+            max-width: 1440px;
+            margin: 24px auto;
+            gap: 24px;
+            padding: 0 24px;
+            width: 100%;
+            height: 0; /* Important to keep it within remaining flex space */
+        }
+        
+        .chat-section {
+            flex: 2;
+            display: flex;
+            flex-direction: column;
+            background: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06);
+            border: 1px solid #e2e8f0;
+            overflow: hidden;
+            height: 100%;
+        }
+        
+        .sidebar {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+            min-width: 320px;
+            height: 100%;
+            overflow-y: auto;
+            padding-bottom: 24px;
+            padding-right: 8px; /* space for scrollbar */
+        }
+
+        .sidebar::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .sidebar::-webkit-scrollbar-thumb {
+            background-color: #cbd5e0;
+            border-radius: 10px;
+        }
+        
+        .chat-header {
+            background: #ffffff;
+            color: #2d3748;
+            border-bottom: 1px solid #e2e8f0;
+            padding: 20px 24px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .quick-actions {
+            padding: 16px 24px;
+            background: #f8fafc;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        
+        .quick-btn {
+            background: #ffffff;
+            color: #3182ce;
+            border: 1px solid #bee3f8;
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: all 0.2s;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        }
+        
+        .quick-btn:hover {
+            background: #ebf8ff;
+            border-color: #90cdf4;
+            transform: translateY(-1px);
+        }
+        
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 24px;
+            background-color: #f7fafc;
+            scroll-behavior: smooth;
+        }
+
+        .chat-messages::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .chat-messages::-webkit-scrollbar-thumb {
+            background-color: #cbd5e0;
+            border-radius: 10px;
+        }
+        
+        .message {
+            margin-bottom: 24px;
+            padding: 16px 20px;
+            border-radius: 12px;
+            max-width: 85%;
+            animation: fadeIn 0.3s ease-in;
+            font-size: 0.95rem;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* Typing indicator animations */
+        .typing-indicator {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            padding: 8px 12px;
+            background: #f7fafc;
+            border-radius: 12px;
+            width: fit-content;
+            margin-bottom: 24px;
+            border: 1px solid #e2e8f0;
+            border-bottom-left-radius: 4px;
+        }
+
+        .typing-dot {
+            width: 6px;
+            height: 6px;
+            background-color: #a0aec0;
+            border-radius: 50%;
+            animation: typing 1.4s infinite ease-in-out both;
+        }
+
+        .typing-dot:nth-child(1) { animation-delay: -0.32s; }
+        .typing-dot:nth-child(2) { animation-delay: -0.16s; }
+        .typing-dot:nth-child(3) { animation-delay: 0s; }
+
+        @keyframes typing {
+            0%, 80%, 100% { transform: scale(0); opacity: 0.5; }
+            40% { transform: scale(1); opacity: 1; }
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(300px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        
+        @keyframes slideOut {
+            from { transform: translateX(0); opacity: 1; }
+            to { transform: translateX(300px); opacity: 0; }
+        }
+        
+        .user-message {
+            background: #3182ce;
+            color: #ffffff;
+            margin-left: auto;
+            border-bottom-right-radius: 4px;
+        }
+        
+        .bot-message {
+            background: #ffffff;
+            color: #2d3748;
+            border-bottom-left-radius: 4px;
+            border-left: 4px solid #48bb78;
+            line-height: 1.6;
+            border-top: 1px solid #e2e8f0;
+            border-right: 1px solid #e2e8f0;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        
+        .bot-message .response-content {
+            margin-top: 12px;
+        }
+        
+        .bot-message .response-section {
+            margin: 16px 0;
+            padding: 12px 16px;
+            background: #fff5f5;
+            border-radius: 8px;
+            border-left: 3px solid #e53e3e;
+        }
+        
+        .bot-message .emergency-alert {
+            background: #e53e3e;
+            color: white;
+            padding: 16px;
+            border-radius: 8px;
+            margin: 12px 0;
+            border: none;
+            font-weight: 600;
+            box-shadow: 0 2px 4px rgba(229, 62, 62, 0.2);
+        }
+        
+        .bot-message .info-box {
+            background: #319795;
+            color: white;
+            padding: 16px;
+            border-radius: 8px;
+            margin: 12px 0;
+            box-shadow: 0 2px 4px rgba(49, 151, 149, 0.2);
+        }
+        
+        .bot-message .procedure-list {
+            background: #fffff0;
+            border: 1px solid #fefcbf;
+            border-radius: 8px;
+            padding: 16px;
+            margin: 12px 0;
+        }
+        
+        .bot-message .procedure-list h4 {
+            color: #975a16;
+            margin-bottom: 12px;
+            border-bottom: 1px solid #fefcbf;
+            padding-bottom: 8px;
+        }
+        
+        .bot-message .step-item {
+            padding: 10px 0;
+            border-bottom: 1px dashed #e2e8f0;
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+        }
+        
+        .bot-message .step-item:last-child {
+            border-bottom: none;
+        }
+        
+        .step-number {
+            background: #e53e3e;
+            color: white;
+            border-radius: 50%;
+            width: 26px;
+            height: 26px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.85rem;
+            font-weight: 700;
+            flex-shrink: 0;
+            box-shadow: 0 2px 4px rgba(229, 62, 62, 0.2);
+        }
+        
+        .collapsible {
+            background: #edf2f7;
+            color: #2d3748;
+            cursor: pointer;
+            padding: 12px 16px;
+            border: 1px solid #e2e8f0;
+            text-align: left;
+            outline: none;
+            font-size: 0.95rem;
+            font-weight: 600;
+            border-radius: 8px;
+            margin: 8px 0;
+            width: 100%;
+            transition: all 0.2s ease;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .collapsible:hover {
+            background: #e2e8f0;
+        }
+        
+        .collapsible:after {
+            content: '\f067'; /* FontAwesome plus */
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
+            color: #718096;
+            margin-left: 8px;
+            transition: transform 0.3s ease;
+        }
+        
+        .collapsible.active:after {
+            content: '\f068'; /* FontAwesome minus */
+            transform: rotate(180deg);
+        }
+        
+        .collapsible-content {
+            padding: 0 16px;
+            max-height: 0;
+            overflow: hidden;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            background: #ffffff;
+            border-radius: 0 0 8px 8px;
+            border: 1px solid transparent;
+            opacity: 0;
+        }
+        
+        .collapsible-content.active {
+            padding: 16px;
+            max-height: 1000px;
+            border-color: #e2e8f0;
+            border-top: none;
+            opacity: 1;
+            margin-bottom: 8px;
+            transform: translateY(-4px); /* seamless attachment to header */
+            border-top-left-radius: 0;
+            border-top-right-radius: 0;
+        }
+        
+        .copy-btn {
+            background: #f7fafc;
+            color: #4a5568;
+            border: 1px solid #cbd5e0;
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 500;
+            margin-left: 10px;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .copy-btn:hover {
+            background: #edf2f7;
+            color: #2d3748;
+            border-color: #a0aec0;
+        }
+        
+        .source-info {
+            background: #f0fff4;
+            border: 1px solid #c6f6d5;
+            border-radius: 6px;
+            padding: 10px 14px;
+            margin: 12px 0;
+            font-size: 0.9rem;
+            color: #276749;
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+        }
+        
+        .highlight {
+            background: rgba(254, 252, 191, 0.6);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: 600;
+            color: #744210;
+        }
+        
+        .chat-input-area {
+            padding: 24px;
+            border-top: 1px solid #e2e8f0;
+            background: #ffffff;
+            border-bottom-left-radius: 12px;
+            border-bottom-right-radius: 12px;
+        }
+        
+        .chat-input {
+            display: flex;
+            gap: 12px;
+            align-items: flex-end;
+            position: relative;
+        }
+        
+        #messageInput {
+            flex: 1;
+            padding: 14px 20px;
+            border: 1px solid #cbd5e0;
+            border-radius: 24px;
+            font-size: 0.95rem;
+            resize: none;
+            min-height: 52px;
+            max-height: 140px;
+            background: #f7fafc;
+            color: #2d3748;
+            transition: all 0.2s;
+            line-height: 1.5;
+            box-shadow: inset 0 2px 4px 0 rgba(0, 0, 0, 0.02);
+        }
+        
+        #messageInput:focus {
+            border-color: #3182ce;
+            background: #ffffff;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.15);
+        }
+        
+        .send-btn {
+            background: #3182ce;
+            color: white;
+            border: none;
+            width: 52px;
+            height: 52px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 6px rgba(49, 130, 206, 0.2);
+            flex-shrink: 0;
+        }
+        
+        .send-btn:hover:not(:disabled) {
+            background: #2b6cb0;
+            transform: scale(1.05) translateY(-2px);
+            box-shadow: 0 6px 8px rgba(49, 130, 206, 0.3);
+        }
+        
+        .send-btn:disabled {
+            background: #e2e8f0;
+            color: #a0aec0;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+        
+        .sidebar-card {
+            background: #ffffff;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06);
+            border: 1px solid #e2e8f0;
+            flex-shrink: 0;
+        }
+        
+        .sidebar-card h3 {
+            color: #e53e3e;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border-bottom: 1px solid #e2e8f0;
+            padding-bottom: 12px;
+        }
+        
+        .emergency-btn {
+            width: 100%;
+            background: #e53e3e;
+            color: white;
+            border: none;
+            padding: 15px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            transition: all 0.3s;
+        }
+        
+        .emergency-btn:hover {
+            background: #c82333;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(220, 53, 69, 0.3);
+        }
+        
+        .location-info {
+            background: #e7f3ff;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+        
+        .contact-list {
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        
+        .contact-item {
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 8px;
+            border-left: 3px solid #007bff;
+        }
+        
+        .typing {
+            opacity: 0.7;
+            font-style: italic;
+        }
+        
+        .typing::after {
+            content: '';
+            animation: typing 1.5s infinite;
+        }
+        
+        @keyframes typing {
+            0%, 50% { content: ''; }
+            25% { content: '.'; }
+            50% { content: '..'; }
+            75% { content: '...'; }
+        }
+        
+        .location-btn {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-bottom: 10px;
+            width: 100%;
+            transition: background-color 0.3s;
+        }
+        
+        .location-btn:hover {
+            background: #218838;
+        }
+        
+        @media (max-width: 768px) {
+            .main-container {
+                flex-direction: column;
+                margin: 10px;
+                gap: 10px;
+            }
+            
+            .sidebar {
+                min-width: auto;
+            }
+            
+            .quick-actions {
+                padding: 10px;
+            }
+            
+            .message {
+                max-width: 95%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🏥 Disaster Management Assistant</h1>
+        <div class="nav-links">
+            <a href="/">💬 Chat</a>
+            <a href="/admin">⚙️ Admin</a>
+        </div>
+    </div>
+    
+    <div class="main-container">
+        <!-- Chat Section -->
+        <div class="chat-section">
+            <div class="chat-header">
+                <h2>🤖 Emergency Response Assistant</h2>
+                <p>Get help with disaster preparedness and emergency response</p>
+            </div>
+            
+            <div class="quick-actions">
+                <button class="quick-btn" onclick="sendQuickMessage('What should I do in case of fire?')">🔥 Fire Safety</button>
+                <button class="quick-btn" onclick="sendQuickMessage('How to prepare for earthquakes?')">🌍 Earthquake</button>
+                <button class="quick-btn" onclick="sendQuickMessage('Flood emergency procedures')">🌊 Flood</button>
+                <button class="quick-btn" onclick="sendQuickMessage('Emergency kit checklist')">🎒 Emergency Kit</button>
+                <button class="quick-btn" onclick="sendQuickMessage('How to evacuate safely?')">🚨 Evacuation</button>
+                <button class="quick-btn" onclick="clearConversation()">🗑️ Clear Chat</button>
+            </div>
+            
+            <div class="chat-messages" id="chatMessages">
+                <div class="message bot-message">
+                    <div style="display: flex; align-items: center; margin-bottom: 10px;">
+                        <strong>🤖 Emergency Assistant:</strong>
+                        <button class="copy-btn" onclick="copyToClipboard('Hello! I\\'m your disaster management assistant ready to help with emergency preparedness and response.')" title="Copy welcome message">📋 Copy</button>
+                    </div>
+                    <div class="response-content">
+                        <div class="info-box">
+                            🚨 <strong>Emergency Response Ready</strong> 🚨<br>
+                            Your AI-powered disaster management assistant is active and ready to help!
+                        </div>
+                        
+                        <div class="procedure-list">
+                            <h4>🛡️ How I Can Assist You:</h4>
+                            <div class="step-item">
+                                <div class="step-number">1</div>
+                                <div><strong>Emergency Procedures:</strong> Get step-by-step guidance for fire, earthquake, flood, and other disasters</div>
+                            </div>
+                            <div class="step-item">
+                                <div class="step-number">2</div>
+                                <div><strong>Safety Planning:</strong> Learn about evacuation routes, emergency kits, and family safety plans</div>
+                            </div>
+                            <div class="step-item">
+                                <div class="step-number">3</div>
+                                <div><strong>First Aid Guidance:</strong> Get immediate help with medical emergencies and first aid procedures</div>
+                            </div>
+                            <div class="step-item">
+                                <div class="step-number">4</div>
+                                <div><strong>Emergency Contacts:</strong> Access important emergency numbers and local resources</div>
+                            </div>
+                        </div>
+                        
+                        <button class="collapsible">📚 View More Capabilities</button>
+                        <div class="collapsible-content">
+                            <div style="padding: 15px;">
+                                <strong>Advanced Features:</strong><br>
+                                • Document-based responses from emergency manuals<br>
+                                • Location-aware emergency services<br>
+                                • Real-time safety recommendations<br>
+                                • Disaster-specific preparedness guides<br>
+                                • Interactive emergency checklists<br><br>
+                                
+                                <div class="emergency-alert">
+                                    ⚠️ <strong>Important:</strong> For immediate life-threatening emergencies, call 911 directly!
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div style="margin-top: 15px; padding: 12px; background: rgba(23, 162, 184, 0.1); border-radius: 8px; border-left: 4px solid #17a2b8;">
+                            💬 <strong>Ready to help!</strong> Ask me anything about disaster preparedness, emergency procedures, or safety planning.
+                        </div>
+                        
+                        <div class="source-info">
+                            📚 <strong>Source:</strong> This response includes information from emergency management protocols and disaster response procedures.
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="chat-input-area">
+                <div class="chat-input">
+                    <textarea 
+                        id="messageInput" 
+                        placeholder="Ask about emergency procedures, safety tips, or disaster preparedness..."
+                        onkeypress="handleKeyPress(event)"
+                    ></textarea>
+                    <button class="send-btn" onclick="sendMessage()" id="sendBtn">
+                        📤 Send
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <!-- Emergency Actions -->
+            <div class="sidebar-card">
+                <h3>🚨 Emergency Actions</h3>
+                <button class="emergency-btn" onclick="callEmergency('911')">
+                    📞 Call 911
+                </button>
+                <button class="emergency-btn" onclick="shareLocation()" style="background: #fd7e14;">
+                    📍 Share Location
+                </button>
+                <button class="location-btn" onclick="findNearbyHelp()">
+                    🏥 Find Nearby Help
+                </button>
+            </div>
+            
+            <!-- Location Info -->
+            <div class="sidebar-card">
+                <h3>📍 Your Location</h3>
+                <div class="location-info" id="locationInfo">
+                    <p>📍 Location not set</p>
+                    <small>Click "Get My Location" to enable location services</small>
+                </div>
+                <button class="location-btn" onclick="getCurrentLocation()">
+                    🎯 Get My Location
+                </button>
+                <div id="weatherInfo" style="margin-top: 10px;"></div>
+            </div>
+            
+            <!-- Emergency Contacts -->
+            <div class="sidebar-card">
+                <h3>☎️ Emergency Contacts</h3>
+                <div class="contact-list" id="emergencyContacts">
+                    <div class="contact-item">
+                        <strong>Emergency Services</strong><br>
+                        📞 911<br>
+                        🏷️ All Emergencies
+                    </div>
+                    <div class="contact-item">
+                        <strong>Poison Control</strong><br>
+                        📞 1-800-222-1222<br>
+                        🏷️ Poison Emergency
+                    </div>
+                    <div class="contact-item">
+                        <strong>Red Cross</strong><br>
+                        📞 1-800-RED-CROSS<br>
+                        🏷️ Disaster Relief
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Quick Tips -->
+            <div class="sidebar-card">
+                <h3>💡 Quick Safety Tips</h3>
+                <div id="safetyTips">
+                    <p><strong>🔥 Fire:</strong> Stay low, check doors, have an exit plan</p>
+                    <p><strong>🌍 Earthquake:</strong> Drop, Cover, Hold On</p>
+                    <p><strong>🌊 Flood:</strong> Turn Around, Don't Drown</p>
+                    <p><strong>⛈️ Storm:</strong> Stay indoors, avoid windows</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const chatMessages = document.getElementById('chatMessages');
+        const messageInput = document.getElementById('messageInput');
+        const sendBtn = document.getElementById('sendBtn');
+        const sessionId = 'session_' + Date.now();
+        let userLocation = null;
+        
+        async function addMessage(content, isUser = false) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${isUser ? 'user-message' : 'bot-message'}`;
+            
+            if (isUser) {
+                messageDiv.innerHTML = `<strong>👤 You:</strong> ${content}`;
+                chatMessages.appendChild(messageDiv);
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            } else {
+                const formattedContent = formatBotResponse(content);
+                messageDiv.innerHTML = `
+                    <div style="display: flex; align-items: center; margin-bottom: 10px;">
+                        <strong>🤖 Assistant:</strong>
+                        <button class="copy-btn" onclick="copyToClipboard('${content.replace(/'/g, "\\'")}')" title="Copy response">📋 Copy</button>
+                    </div>
+                    <div class="response-content"></div>
+                `;
+                chatMessages.appendChild(messageDiv);
+                
+                const contentContainer = messageDiv.querySelector('.response-content');
+                await typeoutHTML(contentContainer, formattedContent, 5); // 5ms typing speed
+                
+                // Add interactivity to collapsible sections after typing
+                addCollapsibleFunctionality(messageDiv);
+            }
+        }
+        
+        async function typeoutHTML(element, htmlString, speed = 5) {
+            // Parse HTML safely
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = htmlString;
+            
+            async function processNode(node, targetParent) {
+                if (node.nodeType === Node.TEXT_NODE) {
+                    const text = node.textContent;
+                    // Skip empty text nodes to prevent delays
+                    if (!text.trim() && text.length > 0) {
+                        targetParent.appendChild(document.createTextNode(text));
+                        return;
+                    }
+                    
+                    const textNode = document.createTextNode('');
+                    targetParent.appendChild(textNode);
+                    
+                    for (let i = 0; i < text.length; i++) {
+                        textNode.textContent += text[i];
+                        chatMessages.scrollTop = chatMessages.scrollHeight;
+                        // Extremely fast timeout or occasionally skip for faster fluid reading
+                        if (i % 2 === 0) await new Promise(r => setTimeout(r, speed));
+                    }
+                } else if (node.nodeType === Node.ELEMENT_NODE) {
+                    const el = document.createElement(node.tagName);
+                    // Copy attributes
+                    Array.from(node.attributes).forEach(attr => el.setAttribute(attr.name, attr.value));
+                    targetParent.appendChild(el);
+                    
+                    for (const child of Array.from(node.childNodes)) {
+                        await processNode(child, el);
+                    }
+                }
+            }
+            
+            for (const child of Array.from(tempDiv.childNodes)) {
+                await processNode(child, element);
+            }
+        }
+        
+        function formatBotResponse(content) {
+            // Detect emergency keywords
+            const emergencyKeywords = ['emergency', 'urgent', 'immediate', 'danger', 'warning', 'alert', 'call 911', '911'];
+            const isEmergency = emergencyKeywords.some(keyword => 
+                content.toLowerCase().includes(keyword.toLowerCase())
+            );
+            
+            let formatted = content;
+            
+            // Format emergency alerts
+            if (isEmergency) {
+                formatted = formatted.replace(/(call 911|911|emergency|immediate[ly]?|urgent[ly]?)/gi, 
+                    '<span class="highlight">$1</span>');
+            }
+            
+            // Convert numbered lists to styled steps
+            formatted = formatted.replace(/(\d+\.)\s+([^\n]+)/g, (match, num, text) => {
+                const stepNum = num.replace('.', '');
+                return `<div class="step-item"><div class="step-number">${stepNum}</div><div>${text}</div></div>`;
+            });
+            
+            // Format bullet points
+            formatted = formatted.replace(/^[-*•]\s+(.+)$/gm, '<div style="margin: 8px 0; padding-left: 24px; position: relative;"><span style="position: absolute; left: 0; color: #e53e3e; font-weight: bold; font-size: 1.2rem; line-height: 1;">•</span>$1</div>');
+            
+            // Format headers/sections
+            formatted = formatted.replace(/\*\*([^*]+)\*\*/g, '<h4 style="color: #2d3748; font-size: 1.1rem; margin: 20px 0 12px 0; border-bottom: 2px solid #e2e8f0; padding-bottom: 8px; font-weight: 600;">$1</h4>');
+            
+            // Add emergency alert box for urgent content
+            if (isEmergency) {
+                formatted = `
+                    <div class="emergency-alert">
+                        🚨 <strong>Emergency Information</strong> 🚨
+                    </div>
+                    ${formatted}
+                `;
+            }
+            
+            // Break into sections if content is long
+            if (formatted.length > 300) {
+                const sections = formatted.split('\n\n');
+                if (sections.length > 2) {
+                    const firstSection = sections.slice(0, 2).join('\n\n');
+                    const remainingSections = sections.slice(2).join('\n\n');
+                    
+                    formatted = `
+                        ${firstSection}
+                        <button class="collapsible">📖 Read More Details</button>
+                        <div class="collapsible-content">
+                            ${remainingSections}
+                        </div>
+                    `;
+                }
+            }
+            
+            // Add source information hint
+            formatted += `
+                <div class="source-info">
+                    📚 <strong>Source:</strong> This response is based on disaster management knowledge base and training data.
+                </div>
+            `;
+            
+            // Convert line breaks to HTML
+            return formatted.replace(/\n/g, '<br>');
+        }
+        
+        function addCollapsibleFunctionality(messageDiv) {
+            const collapsibles = messageDiv.querySelectorAll('.collapsible');
+            collapsibles.forEach(collapsible => {
+                collapsible.addEventListener('click', function() {
+                    this.classList.toggle('active');
+                    const content = this.nextElementSibling;
+                    content.classList.toggle('active');
+                });
+            });
+        }
+        
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                showToast('Response copied to clipboard!');
+            }).catch(() => {
+                // Fallback for older browsers
+                const textArea = document.createElement('textarea');
+                textArea.value = text;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+                showToast('Response copied to clipboard!');
+            });
+        }
+        
+        function showToast(message) {
+            const toast = document.createElement('div');
+            toast.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: #28a745;
+                color: white;
+                padding: 12px 20px;
+                border-radius: 8px;
+                z-index: 1000;
+                animation: slideIn 0.3s ease-out;
+            `;
+            toast.innerHTML = message;
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.style.animation = 'slideOut 0.3s ease-in';
+                setTimeout(() => document.body.removeChild(toast), 300);
+            }, 3000);
+        }
+        
+        function addTypingIndicator() {
+            const typingDiv = document.createElement('div');
+            typingDiv.className = 'typing-indicator';
+            typingDiv.id = 'typing';
+            typingDiv.innerHTML = `
+                <div class="typing-dot"></div>
+                <div class="typing-dot"></div>
+                <div class="typing-dot"></div>
+            `;
+            chatMessages.appendChild(typingDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+        
+        function removeTypingIndicator() {
+            const typingElement = document.getElementById('typing');
+            if (typingElement) {
+                typingElement.remove();
+            }
+        }
+        
+        async function sendMessage() {
+            const message = messageInput.value.trim();
+            if (!message) return;
+            
+            addMessage(message, true);
+            messageInput.value = '';
+            sendBtn.disabled = true;
+            addTypingIndicator();
+            
+            try {
+                const response = await fetch('/chat', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        message: message,
+                        session_id: sessionId
+                    })
+                });
+                
+                const data = await response.json();
+                
+                removeTypingIndicator();
+                
+                if (data.success) {
+                    await addMessage(data.response);
+                } else {
+                    await addMessage(`❌ ${data.error}`);
+                }
+                
+            } catch (error) {
+                removeTypingIndicator();
+                await addMessage(`❌ Network error: ${error.message}`);
+            }
+            
+            sendBtn.disabled = false;
+            messageInput.focus();
+        }
+        
+        function sendQuickMessage(message) {
+            messageInput.value = message;
+            sendMessage();
+        }
+        
+        async function clearConversation() {
+            try {
+                await fetch('/clear_conversation', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        session_id: sessionId
+                    })
+                });
+                
+                chatMessages.innerHTML = `
+                    <div class="message bot-message">
+                        <strong>🤖 Emergency Assistant:</strong> Conversation cleared! How can I help you today?
+                    </div>
+                `;
+                
+            } catch (error) {
+                console.error('Error clearing conversation:', error);
+            }
+        }
+        
+        function handleKeyPress(event) {
+            if (event.key === 'Enter' && !event.shiftKey) {
+                event.preventDefault();
+                if (!sendBtn.disabled) {
+                    sendMessage();
+                }
+            }
+        }
+        
+        function callEmergency(number) {
+            if (confirm(`Call ${number} for emergency assistance?`)) {
+                window.location.href = `tel:${number}`;
+            }
+        }
+        
+        function shareLocation() {
+            if (userLocation) {
+                const locationText = `My current location: ${userLocation.latitude}, ${userLocation.longitude}`;
+                if (navigator.share) {
+                    navigator.share({
+                        title: 'Emergency Location Share',
+                        text: locationText,
+                        url: `https://maps.google.com/?q=${userLocation.latitude},${userLocation.longitude}`
+                    });
+                } else {
+                    navigator.clipboard.writeText(locationText);
+                    alert('Location copied to clipboard!');
+                }
+            } else {
+                alert('Please get your location first');
+                getCurrentLocation();
+            }
+        }
+        
+        function getCurrentLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    async function(position) {
+                        userLocation = {
+                            latitude: position.coords.latitude,
+                            longitude: position.coords.longitude
+                        };
+                        
+                        // Reverse geocode to get address
+                        try {
+                            const response = await fetch(`https://api.opencagedata.com/geocode/v1/json?q=${userLocation.latitude}+${userLocation.longitude}&key=YOUR_API_KEY`);
+                            const data = await response.json();
+                            
+                            let address = `${userLocation.latitude.toFixed(4)}, ${userLocation.longitude.toFixed(4)}`;
+                            if (data.results && data.results[0]) {
+                                address = data.results[0].formatted;
+                            }
+                            
+                            document.getElementById('locationInfo').innerHTML = `
+                                <p>📍 ${address}</p>
+                                <small>Lat: ${userLocation.latitude.toFixed(4)}, Lng: ${userLocation.longitude.toFixed(4)}</small>
+                            `;
+                            
+                        } catch (error) {
+                            document.getElementById('locationInfo').innerHTML = `
+                                <p>📍 Location: ${userLocation.latitude.toFixed(4)}, ${userLocation.longitude.toFixed(4)}</p>
+                                <small>GPS coordinates obtained</small>
+                            `;
+                        }
+                    },
+                    function(error) {
+                        alert('Error getting location: ' + error.message);
+                    }
+                );
+            } else {
+                alert('Geolocation is not supported by this browser');
+            }
+        }
+        
+        function findNearbyHelp() {
+            if (userLocation) {
+                const query = `emergency services near ${userLocation.latitude},${userLocation.longitude}`;
+                window.open(`https://www.google.com/maps/search/${encodeURIComponent(query)}`, '_blank');
+            } else {
+                alert('Please share your location first');
+                getCurrentLocation();
+            }
+        }
+        
+        // Auto-resize textarea
+        messageInput.addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = Math.min(this.scrollHeight, 120) + 'px';
+        });
+        
+        // Focus on input when page loads
+        messageInput.focus();
+        
+        // Load emergency contacts from server (if available)
+        async function loadEmergencyContacts() {
+            try {
+                const response = await fetch('/get_stats');
+                const stats = await response.json();
+                // Could load emergency contacts here if needed
+            } catch (error) {
+                console.error('Error loading contacts:', error);
+            }
+        }
+        
+        // Initialize
+        loadEmergencyContacts();
+        
+        // Initialize collapsible functionality for welcome message
+        document.addEventListener('DOMContentLoaded', function() {
+            const welcomeMessage = document.querySelector('#chatMessages .bot-message');
+            if (welcomeMessage) {
+                addCollapsibleFunctionality(welcomeMessage);
+            }
+        });
+    </script>
+</body>
+</html>

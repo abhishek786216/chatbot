@@ -1,0 +1,1035 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - Disaster Management Chatbot</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        }
+        
+        body {
+            background-color: #f4f6f8;
+            color: #1a202c;
+        }
+        
+        .header {
+            background: #ffffff;
+            color: #e53e3e;
+            padding: 20px 32px;
+            text-align: left;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 700;
+        }
+        
+        .nav {
+            background: #ffffff;
+            padding: 12px 32px;
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            gap: 16px;
+        }
+        
+        .nav a {
+            color: #4a5568;
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-weight: 500;
+            font-size: 0.95rem;
+            transition: all 0.2s ease;
+            background: #f7fafc;
+            border: 1px solid #e2e8f0;
+        }
+        
+        .nav a:hover {
+            background-color: #edf2f7;
+            color: #2d3748;
+        }
+        
+        .container {
+            max-width: 1280px;
+            margin: 32px auto;
+            padding: 0 24px;
+        }
+        
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 24px;
+        }
+        
+        .card {
+            background: #ffffff;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06);
+            border: 1px solid #e2e8f0;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05);
+        }
+        
+        .card h3 {
+            color: #2d3748;
+            margin-bottom: 16px;
+            font-size: 1.15rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-bottom: 1px solid #e2e8f0;
+            padding-bottom: 12px;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        
+        .stat-item {
+            text-align: center;
+            padding: 24px;
+            background: #f7fafc;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+        }
+        
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #3182ce;
+        }
+        
+        .stat-label {
+            color: #718096;
+            margin-top: 8px;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #4a5568;
+            font-size: 0.95rem;
+        }
+        
+        input, textarea, select {
+            width: 100%;
+            padding: 10px 14px;
+            border: 1px solid #cbd5e0;
+            border-radius: 6px;
+            font-size: 0.95rem;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            background: #ffffff;
+            color: #2d3748;
+        }
+        
+        input:focus, textarea:focus, select:focus {
+            border-color: #3182ce;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.15);
+        }
+        
+        button {
+            background: #3182ce;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.95rem;
+            font-weight: 500;
+            transition: all 0.2s;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        }
+        
+        button:hover {
+            background: #2b6cb0;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        
+        .btn-secondary {
+            background: #edf2f7;
+            color: #4a5568;
+            border: 1px solid #e2e8f0;
+        }
+        
+        .btn-secondary:hover {
+            background: #e2e8f0;
+            color: #2d3748;
+        }
+        
+        .btn-danger {
+            background: #e53e3e;
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            background: #c53030;
+        }
+        
+        .alerts {
+            margin-bottom: 24px;
+        }
+        
+        .alert {
+            padding: 16px;
+            border-radius: 8px;
+            margin-bottom: 12px;
+            display: none;
+            font-weight: 500;
+            font-size: 0.95rem;
+        }
+        
+        .alert-success {
+            background-color: #f0fff4;
+            border: 1px solid #c6f6d5;
+            color: #2f855a;
+        }
+        
+        .alert-error {
+            background-color: #fff5f5;
+            border: 1px solid #fed7d7;
+            color: #c53030;
+        }
+        
+        .file-upload-area {
+            border: 2px dashed #cbd5e0;
+            border-radius: 12px;
+            padding: 40px 20px;
+            text-align: center;
+            background: #f7fafc;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+        
+        .file-upload-area:hover {
+            border-color: #3182ce;
+            background: #ebf8ff;
+        }
+        
+        .contacts-list, .locations-list {
+            max-height: 350px;
+            overflow-y: auto;
+            padding-right: 8px;
+        }
+        
+        .contact-item, .location-item {
+            background: #f7fafc;
+            padding: 16px;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+            margin-bottom: 10px;
+            border-left: 4px solid #dc3545;
+        }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+        
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #dc3545;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🏥 Disaster Management Admin Panel</h1>
+        <p>Training Interface for Emergency Response Chatbot</p>
+    </div>
+    
+    <div class="nav">
+        <a href="/">👤 User Interface</a>
+        <a href="/admin">⚙️ Admin Dashboard</a>
+    </div>
+    
+    <div class="container">
+        <div class="alerts">
+            <div id="successAlert" class="alert alert-success"></div>
+            <div id="errorAlert" class="alert alert-error"></div>
+        </div>
+        
+        <div class="dashboard-grid">
+            <!-- Statistics Card -->
+            <div class="card">
+                <h3>📊 System Statistics</h3>
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <div class="stat-number" id="totalDocs">{{ stats.total_documents }}</div>
+                        <div class="stat-label">Total Documents</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number" id="pdfDocs">{{ stats.pdf_documents }}</div>
+                        <div class="stat-label">PDF Documents</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number" id="webDocs">{{ stats.web_documents }}</div>
+                        <div class="stat-label">Web Pages</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number" id="uniqueSources">{{ stats.unique_sources }}</div>
+                        <div class="stat-label">Unique Sources</div>
+                    </div>
+                </div>
+                <button onclick="refreshStats()" class="btn-secondary">🔄 Refresh Stats</button>
+            </div>
+            
+            <!-- PDF Upload Card -->
+            <div class="card">
+                <h3>📄 Upload PDF Documents</h3>
+                <div class="file-upload-area">
+                    <input type="file" id="pdfFile" accept=".pdf" style="display: none;" onchange="handleFileSelect()">
+                    <div onclick="document.getElementById('pdfFile').click()" style="cursor: pointer;">
+                        <strong>Click to select PDF file</strong><br>
+                        <small>Drag and drop support coming soon</small>
+                    </div>
+                </div>
+                <div id="uploadLoading" class="loading">
+                    <div class="spinner"></div>
+                    <p>Processing PDF...</p>
+                </div>
+                <button id="uploadBtn" onclick="uploadPDF()" disabled>📤 Upload & Process</button>
+            </div>
+            
+            <!-- Text Input Training Card -->
+            <div class="card">
+                <h3>✏️ Add Text Content</h3>
+                <div class="form-group">
+                    <label for="sourceName">Source Name:</label>
+                    <input type="text" id="sourceName" placeholder="e.g., Emergency Procedures, Safety Guide" />
+                </div>
+                <div class="form-group">
+                    <label for="textContent">Text Content:</label>
+                    <textarea id="textContent" rows="8" placeholder="Enter or paste your disaster management text content here...&#10;&#10;Examples:&#10;- Emergency evacuation procedures&#10;- First aid instructions&#10;- Disaster preparedness guidelines&#10;- Safety protocols&#10;- Response procedures" style="width: 100%; resize: vertical; font-family: inherit; padding: 10px; border: 1px solid #ccc; border-radius: 5px;"></textarea>
+                </div>
+                <div id="textLoading" class="loading">
+                    <div class="spinner"></div>
+                    <p>Processing text content...</p>
+                </div>
+                <button id="textBtn" onclick="addTextContent()">📝 Add to Knowledge Base</button>
+            </div>
+            
+            <!-- Web Scraping Card -->
+            <div class="card">
+                <h3>🌐 Web Scraping</h3>
+                <div class="form-group">
+                    <label for="websiteUrl">Website URL:</label>
+                    <input type="url" id="websiteUrl" placeholder="https://example.com" />
+                </div>
+                <div id="scrapeLoading" class="loading">
+                    <div class="spinner"></div>
+                    <p>Scraping website...</p>
+                </div>
+                <button onclick="scrapeWebsite()">🕷️ Scrape Website</button>
+            </div>
+            
+            <!-- Emergency Contacts Card -->
+            <div class="card">
+                <h3>☎️ Emergency Contacts</h3>
+                <div class="form-group">
+                    <label for="contactName">Name:</label>
+                    <input type="text" id="contactName" placeholder="Emergency Service Name">
+                </div>
+                <div class="form-group">
+                    <label for="contactPhone">Phone:</label>
+                    <input type="tel" id="contactPhone" placeholder="+1-555-0123">
+                </div>
+                <div class="form-group">
+                    <label for="contactEmail">Email:</label>
+                    <input type="email" id="contactEmail" placeholder="contact@emergency.com">
+                </div>
+                <div class="form-group">
+                    <label for="contactType">Type:</label>
+                    <select id="contactType">
+                        <option value="police">Police</option>
+                        <option value="fire">Fire Department</option>
+                        <option value="medical">Medical/Ambulance</option>
+                        <option value="disaster">Disaster Response</option>
+                        <option value="utility">Utility Company</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="contactAddress">Address:</label>
+                    <input type="text" id="contactAddress" placeholder="123 Emergency St, City, State">
+                </div>
+                <button onclick="addEmergencyContact()">➕ Add Contact</button>
+                
+                <div class="contacts-list" id="contactsList">
+                    {% for contact in emergency_contacts %}
+                    <div class="contact-item">
+                        <strong>{{ contact.name }}</strong><br>
+                        📞 {{ contact.phone }}<br>
+                        📧 {{ contact.email }}<br>
+                        🏷️ {{ contact.type.title() }}
+                        {% if contact.address %}
+                        <br>📍 {{ contact.address }}
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            
+            <!-- Location Management Card -->
+            <div class="card">
+                <h3>📍 Location Management</h3>
+                <div class="form-group">
+                    <label for="locationAddress">Address:</label>
+                    <input type="text" id="locationAddress" placeholder="123 Main St, City, State">
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                    <div class="form-group">
+                        <label for="locationLat">Latitude:</label>
+                        <input type="number" id="locationLat" placeholder="40.7128" step="any">
+                    </div>
+                    <div class="form-group">
+                        <label for="locationLng">Longitude:</label>
+                        <input type="number" id="locationLng" placeholder="-74.0060" step="any">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="locationType">Type:</label>
+                    <select id="locationType">
+                        <option value="user">User Location</option>
+                        <option value="emergency">Emergency Center</option>
+                        <option value="shelter">Emergency Shelter</option>
+                        <option value="hospital">Hospital</option>
+                        <option value="supply">Supply Center</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="locationNotes">Notes:</label>
+                    <textarea id="locationNotes" placeholder="Additional information about this location"></textarea>
+                </div>
+                <button onclick="addLocation()">📍 Add Location</button>
+                <button onclick="getCurrentLocation()" class="btn-secondary">🎯 Use My Location</button>
+                
+                <div class="locations-list" id="locationsList">
+                    {% for location in user_locations %}
+                    <div class="location-item">
+                        <strong>{{ location.address }}</strong><br>
+                        🗺️ {{ "{:.4f}".format(location.latitude) }}, {{ "{:.4f}".format(location.longitude) }}<br>
+                        🏷️ {{ location.type.title() }}
+                        {% if location.notes %}
+                        <br>📝 {{ location.notes }}
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            
+            <!-- Database Viewer Card -->
+            <div class="card">
+                <h3>📊 Knowledge Base Viewer</h3>
+                <p>View what content is stored in the knowledge base and how it's organized.</p>
+                <button onclick="viewDatabase()" class="btn-primary">📋 View All Documents</button>
+                <button onclick="getDatabaseAnalytics()" class="btn-secondary">📈 View Analytics</button>
+                
+                <div id="databaseViewer" style="display: none; margin-top: 20px;">
+                    <h4>Knowledge Base Contents:</h4>
+                    <div id="databaseContent" style="max-height: 300px; overflow-y: auto; border: 1px solid #ddd; padding: 10px; border-radius: 5px; background: #f8f9fa;"></div>
+                </div>
+                
+                <div id="analyticsViewer" style="display: none; margin-top: 20px;">
+                    <h4>Database Analytics:</h4>
+                    <div id="analyticsContent" style="border: 1px solid #ddd; padding: 10px; border-radius: 5px; background: #f8f9fa;"></div>
+                </div>
+            </div>
+            
+            <!-- Query Logs Card -->
+            <div class="card">
+                <h3>🔍 Query Logs & Source Usage</h3>
+                <p>See what sources are being used to answer user questions.</p>
+                <button onclick="viewQueryLogs()" class="btn-primary">📜 View Recent Queries</button>
+                <div class="form-group" style="margin-top: 15px;">
+                    <label>Show last:</label>
+                    <select id="logLimit">
+                        <option value="10">10 queries</option>
+                        <option value="25">25 queries</option>
+                        <option value="50">50 queries</option>
+                        <option value="100">All queries</option>
+                    </select>
+                </div>
+                
+                <div id="queryLogsViewer" style="display: none; margin-top: 20px;">
+                    <h4>Recent Queries and Sources Used:</h4>
+                    <div id="queryLogsContent" style="max-height: 400px; overflow-y: auto; border: 1px solid #ddd; padding: 10px; border-radius: 5px; background: #f8f9fa;"></div>
+                </div>
+            </div>
+            
+            <!-- Database Management Card -->
+            <div class="card">
+                <h3>🗄️ Database Management</h3>
+                <p>Manage the knowledge base and clear data when needed.</p>
+                <button onclick="clearDatabase()" class="btn-danger">🗑️ Clear Knowledge Base</button>
+                <br><br>
+                <button onclick="refreshStats()" class="btn-secondary">🔄 Refresh All Data</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let selectedFile = null;
+        
+        function showAlert(message, type = 'success') {
+            const alertId = type === 'success' ? 'successAlert' : 'errorAlert';
+            const alertElement = document.getElementById(alertId);
+            alertElement.textContent = message;
+            alertElement.style.display = 'block';
+            
+            // Hide after 5 seconds
+            setTimeout(() => {
+                alertElement.style.display = 'none';
+            }, 5000);
+        }
+        
+        function handleFileSelect() {
+            const fileInput = document.getElementById('pdfFile');
+            selectedFile = fileInput.files[0];
+            const uploadBtn = document.getElementById('uploadBtn');
+            
+            if (selectedFile) {
+                uploadBtn.disabled = false;
+                uploadBtn.textContent = `📤 Upload "${selectedFile.name}"`;
+            } else {
+                uploadBtn.disabled = true;
+                uploadBtn.textContent = '📤 Upload & Process';
+            }
+        }
+        
+        async function uploadPDF() {
+            if (!selectedFile) return;
+            
+            const formData = new FormData();
+            formData.append('file', selectedFile);
+            
+            const uploadLoading = document.getElementById('uploadLoading');
+            const uploadBtn = document.getElementById('uploadBtn');
+            
+            uploadLoading.style.display = 'block';
+            uploadBtn.disabled = true;
+            
+            try {
+                const response = await fetch('/upload_pdf', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    showAlert(result.message, 'success');
+                    updateStats(result.stats);
+                    document.getElementById('pdfFile').value = '';
+                    selectedFile = null;
+                    uploadBtn.textContent = '📤 Upload & Process';
+                } else {
+                    showAlert(result.error, 'error');
+                }
+                
+            } catch (error) {
+                showAlert('Upload failed: ' + error.message, 'error');
+            }
+            
+            uploadLoading.style.display = 'none';
+            uploadBtn.disabled = true;
+        }
+        
+        async function addTextContent() {
+            const sourceName = document.getElementById('sourceName').value.trim();
+            const textContent = document.getElementById('textContent').value.trim();
+            
+            if (!textContent) {
+                showAlert('Please enter text content', 'error');
+                return;
+            }
+            
+            if (textContent.length < 20) {
+                showAlert('Text content must be at least 20 characters long', 'error');
+                return;
+            }
+            
+            const textLoading = document.getElementById('textLoading');
+            const textBtn = document.getElementById('textBtn');
+            
+            textLoading.style.display = 'block';
+            textBtn.disabled = true;
+            
+            try {
+                const response = await fetch('/add_text', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        text: textContent,
+                        source_name: sourceName || 'Manual_Text_Entry'
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    showAlert(result.message, 'success');
+                    updateStats(result.stats);
+                    document.getElementById('sourceName').value = '';
+                    document.getElementById('textContent').value = '';
+                } else {
+                    showAlert(result.error, 'error');
+                }
+                
+            } catch (error) {
+                showAlert('Text processing failed: ' + error.message, 'error');
+            }
+            
+            textLoading.style.display = 'none';
+            textBtn.disabled = false;
+        }
+        
+        async function scrapeWebsite() {
+            const url = document.getElementById('websiteUrl').value.trim();
+            if (!url) {
+                showAlert('Please enter a website URL', 'error');
+                return;
+            }
+            
+            const scrapeLoading = document.getElementById('scrapeLoading');
+            scrapeLoading.style.display = 'block';
+            
+            try {
+                const response = await fetch('/scrape_website', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ url: url })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    showAlert(result.message, 'success');
+                    updateStats(result.stats);
+                    document.getElementById('websiteUrl').value = '';
+                } else {
+                    showAlert(result.error, 'error');
+                }
+                
+            } catch (error) {
+                showAlert('Scraping failed: ' + error.message, 'error');
+            }
+            
+            scrapeLoading.style.display = 'none';
+        }
+        
+        async function addEmergencyContact() {
+            const contact = {
+                name: document.getElementById('contactName').value.trim(),
+                phone: document.getElementById('contactPhone').value.trim(),
+                email: document.getElementById('contactEmail').value.trim(),
+                type: document.getElementById('contactType').value,
+                address: document.getElementById('contactAddress').value.trim()
+            };
+            
+            if (!contact.name || !contact.phone) {
+                showAlert('Name and phone are required', 'error');
+                return;
+            }
+            
+            try {
+                const response = await fetch('/add_emergency_contact', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(contact)
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    showAlert(result.message, 'success');
+                    
+                    // Clear form
+                    document.getElementById('contactName').value = '';
+                    document.getElementById('contactPhone').value = '';
+                    document.getElementById('contactEmail').value = '';
+                    document.getElementById('contactAddress').value = '';
+                    
+                    // Add to list
+                    addContactToList(result.contact);
+                } else {
+                    showAlert(result.error, 'error');
+                }
+                
+            } catch (error) {
+                showAlert('Failed to add contact: ' + error.message, 'error');
+            }
+        }
+        
+        async function addLocation() {
+            const location = {
+                address: document.getElementById('locationAddress').value.trim(),
+                lat: document.getElementById('locationLat').value,
+                lng: document.getElementById('locationLng').value,
+                type: document.getElementById('locationType').value,
+                notes: document.getElementById('locationNotes').value.trim()
+            };
+            
+            if (!location.address && (!location.lat || !location.lng)) {
+                showAlert('Please provide either an address or coordinates', 'error');
+                return;
+            }
+            
+            try {
+                const response = await fetch('/add_location', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(location)
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    showAlert(result.message, 'success');
+                    
+                    // Clear form
+                    document.getElementById('locationAddress').value = '';
+                    document.getElementById('locationLat').value = '';
+                    document.getElementById('locationLng').value = '';
+                    document.getElementById('locationNotes').value = '';
+                    
+                    // Add to list
+                    addLocationToList(result.location);
+                } else {
+                    showAlert(result.error, 'error');
+                }
+                
+            } catch (error) {
+                showAlert('Failed to add location: ' + error.message, 'error');
+            }
+        }
+        
+        function getCurrentLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    function(position) {
+                        document.getElementById('locationLat').value = position.coords.latitude;
+                        document.getElementById('locationLng').value = position.coords.longitude;
+                        showAlert('Location coordinates filled automatically', 'success');
+                    },
+                    function(error) {
+                        showAlert('Error getting location: ' + error.message, 'error');
+                    }
+                );
+            } else {
+                showAlert('Geolocation is not supported by this browser', 'error');
+            }
+        }
+        
+        async function clearDatabase() {
+            if (!confirm('Are you sure you want to clear the entire knowledge base? This action cannot be undone.')) {
+                return;
+            }
+            
+            try {
+                const response = await fetch('/clear_database', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    showAlert(result.message, 'success');
+                    refreshStats();
+                } else {
+                    showAlert(result.error, 'error');
+                }
+                
+            } catch (error) {
+                showAlert('Failed to clear database: ' + error.message, 'error');
+            }
+        }
+        
+        async function refreshStats() {
+            try {
+                const response = await fetch('/get_stats');
+                const stats = await response.json();
+                
+                if (stats.rag) {
+                    updateStats(stats.rag);
+                }
+                
+            } catch (error) {
+                console.error('Failed to refresh stats:', error);
+            }
+        }
+        
+        function updateStats(stats) {
+            document.getElementById('totalDocs').textContent = stats.total_documents;
+            document.getElementById('pdfDocs').textContent = stats.pdf_documents;
+            document.getElementById('webDocs').textContent = stats.web_documents;
+            document.getElementById('uniqueSources').textContent = stats.unique_sources;
+        }
+        
+        function addContactToList(contact) {
+            const contactsList = document.getElementById('contactsList');
+            const contactDiv = document.createElement('div');
+            contactDiv.className = 'contact-item';
+            contactDiv.innerHTML = `
+                <strong>${contact.name}</strong><br>
+                📞 ${contact.phone}<br>
+                📧 ${contact.email}<br>
+                🏷️ ${contact.type.charAt(0).toUpperCase() + contact.type.slice(1)}
+                ${contact.address ? '<br>📍 ' + contact.address : ''}
+            `;
+            contactsList.appendChild(contactDiv);
+        }
+        
+        function addLocationToList(location) {
+            const locationsList = document.getElementById('locationsList');
+            const locationDiv = document.createElement('div');
+            locationDiv.className = 'location-item';
+            locationDiv.innerHTML = `
+                <strong>${location.address}</strong><br>
+                🗺️ ${location.latitude.toFixed(4)}, ${location.longitude.toFixed(4)}<br>
+                🏷️ ${location.type.charAt(0).toUpperCase() + location.type.slice(1)}
+                ${location.notes ? '<br>📝 ' + location.notes : ''}
+            `;
+            locationsList.appendChild(locationDiv);
+        }
+        
+        async function viewDatabase() {
+            try {
+                const response = await fetch('/view_database');
+                const result = await response.json();
+                
+                if (result.success) {
+                    const viewer = document.getElementById('databaseViewer');
+                    const content = document.getElementById('databaseContent');
+                    
+                    let html = `
+                        <div style="margin-bottom: 10px;">
+                            <strong>📊 Total Sources: ${result.total_sources}</strong> | 
+                            <strong>📄 Total Chunks: ${result.total_chunks}</strong>
+                        </div>
+                    `;
+                    
+                    Object.keys(result.sources).forEach(sourceName => {
+                        const chunks = result.sources[sourceName];
+                        html += `
+                            <div style="margin-bottom: 15px; border: 1px solid #ccc; padding: 10px; border-radius: 5px;">
+                                <h5 style="color: #dc3545; margin-bottom: 10px;">📄 ${sourceName}</h5>
+                                <small>📊 ${chunks.length} chunk(s)</small>
+                                <div style="margin-top: 10px;">
+                        `;
+                        
+                        chunks.slice(0, 3).forEach(chunk => {
+                            html += `
+                                <div style="background: white; margin: 5px 0; padding: 8px; border-radius: 3px; border-left: 3px solid #dc3545;">
+                                    <small><strong>Chunk ${chunk.chunk_id}:</strong></small><br>
+                                    <span style="font-size: 0.9em;">${chunk.text_preview}</span>
+                                </div>
+                            `;
+                        });
+                        
+                        if (chunks.length > 3) {
+                            html += `<small>... and ${chunks.length - 3} more chunks</small>`;
+                        }
+                        
+                        html += `</div></div>`;
+                    });
+                    
+                    content.innerHTML = html;
+                    viewer.style.display = 'block';
+                    document.getElementById('analyticsViewer').style.display = 'none';
+                } else {
+                    showAlert(result.error, 'error');
+                }
+                
+            } catch (error) {
+                showAlert('Failed to load database: ' + error.message, 'error');
+            }
+        }
+        
+        async function getDatabaseAnalytics() {
+            try {
+                const response = await fetch('/database_analytics');
+                const result = await response.json();
+                
+                if (result.success) {
+                    const viewer = document.getElementById('analyticsViewer');
+                    const content = document.getElementById('analyticsContent');
+                    const analytics = result.analytics;
+                    
+                    let html = `
+                        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-bottom: 15px;">
+                            <div style="background: white; padding: 10px; border-radius: 5px; text-align: center;">
+                                <div style="font-size: 1.5em; font-weight: bold; color: #dc3545;">${analytics.total_queries}</div>
+                                <small>Total Queries</small>
+                            </div>
+                            <div style="background: white; padding: 10px; border-radius: 5px; text-align: center;">
+                                <div style="font-size: 1.5em; font-weight: bold; color: #28a745;">${analytics.queries_with_sources}</div>
+                                <small>Queries with Sources</small>
+                            </div>
+                        </div>
+                        
+                        <div style="margin-bottom: 15px;">
+                            <h6>📊 Most Used Sources:</h6>
+                            <div style="background: white; padding: 10px; border-radius: 5px;">
+                    `;
+                    
+                    if (Object.keys(analytics.source_usage).length > 0) {
+                        Object.entries(analytics.source_usage).forEach(([source, count]) => {
+                            const percentage = ((count / analytics.total_queries) * 100).toFixed(1);
+                            html += `
+                                <div style="margin: 5px 0; padding: 5px; background: #f8f9fa; border-radius: 3px;">
+                                    <strong>${source}</strong>
+                                    <span style="float: right;">${count} times (${percentage}%)</span>
+                                </div>
+                            `;
+                        });
+                    } else {
+                        html += '<div style="text-align: center; color: #6c757d;">No source usage data yet</div>';
+                    }
+                    
+                    html += `
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <h6>🗄️ Database Status:</h6>
+                            <div style="background: white; padding: 10px; border-radius: 5px;">
+                                <div>📄 Total Sources in Database: <strong>${analytics.total_sources_in_db}</strong></div>
+                                <div>📋 Total Chunks in Database: <strong>${analytics.total_chunks_in_db}</strong></div>
+                            </div>
+                        </div>
+                    `;
+                    
+                    content.innerHTML = html;
+                    viewer.style.display = 'block';
+                    document.getElementById('databaseViewer').style.display = 'none';
+                } else {
+                    showAlert(result.error, 'error');
+                }
+                
+            } catch (error) {
+                showAlert('Failed to load analytics: ' + error.message, 'error');
+            }
+        }
+        
+        async function viewQueryLogs() {
+            try {
+                const limit = document.getElementById('logLimit').value;
+                const response = await fetch('/view_query_logs');
+                const result = await response.json();
+                
+                if (result.success) {
+                    const viewer = document.getElementById('queryLogsViewer');
+                    const content = document.getElementById('queryLogsContent');
+                    let logs = result.query_logs;
+                    
+                    if (limit !== '100') {
+                        logs = logs.slice(0, parseInt(limit));
+                    }
+                    
+                    let html = `
+                        <div style="margin-bottom: 10px;">
+                            <strong>📊 Showing ${logs.length} of ${result.total_queries} queries</strong>
+                        </div>
+                    `;
+                    
+                    if (logs.length === 0) {
+                        html += '<div style="text-align: center; color: #6c757d; padding: 20px;">No queries logged yet</div>';
+                    } else {
+                        logs.forEach(log => {
+                            const date = new Date(log.timestamp).toLocaleString();
+                            html += `
+                                <div style="border: 1px solid #ddd; margin: 10px 0; padding: 10px; border-radius: 5px; background: white;">
+                                    <div style="display: flex; justify-content: between; margin-bottom: 5px;">
+                                        <strong>🕒 ${date}</strong>
+                                        <small style="color: #6c757d;">${log.sources_count} source(s) used</small>
+                                    </div>
+                                    <div style="margin-bottom: 10px;">
+                                        <strong>❓ Query:</strong> ${log.query}
+                                    </div>
+                                    <div style="margin-bottom: 10px;">
+                                        <strong>💬 Response Preview:</strong><br>
+                                        <em style="color: #6c757d;">${log.response_preview}</em>
+                                    </div>
+                            `;
+                            
+                            if (log.sources_used && log.sources_used.length > 0) {
+                                html += '<div><strong>📄 Sources Used:</strong><ul style="margin: 5px 0; padding-left: 20px;">';
+                                log.sources_used.forEach(source => {
+                                    html += `
+                                        <li style="margin: 3px 0;">
+                                            <strong>${source.source}</strong> (Chunk ${source.chunk_id})
+                                            <br><small>${source.chunk_preview}</small>
+                                        </li>
+                                    `;
+                                });
+                                html += '</ul></div>';
+                            } else {
+                                html += '<div style="color: #6c757d;"><em>No sources used for this query</em></div>';
+                            }
+                            
+                            html += '</div>';
+                        });
+                    }
+                    
+                    content.innerHTML = html;
+                    viewer.style.display = 'block';
+                } else {
+                    showAlert(result.error, 'error');
+                }
+                
+            } catch (error) {
+                showAlert('Failed to load query logs: ' + error.message, 'error');
+            }
+        }
+    </script>
+</body>
+</html>
