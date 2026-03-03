@@ -220,7 +220,7 @@ tiktoken>=0.5.2
 timm>=1.0.22
 tokenizers>=0.22.1
 toml>=0.10.2
-torch>=2.5.1+cu121
+torch
 torchmetrics>=1.8.2
 torchvision>=0.20.1+cu121
 tornado>=6.5.2
