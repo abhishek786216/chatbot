@@ -213,18 +213,13 @@ def get_enhanced_response(user_message: str, session_id: str) -> str:
             conversations[session_id] = conversations[session_id][-10:]
         
         # Create enhanced prompt with context
-        system_prompt = """You are a DISASTER MANAGEMENT ONLY assistant. You ONLY respond to questions related to:
-        - Emergency preparedness and planning
-        - Natural disasters (earthquakes, floods, hurricanes, etc.)
-        - Emergency response procedures
-        - Safety protocols and evacuations
-        - First aid and medical emergencies
-        - Emergency supplies and equipment
-        - Disaster recovery and relief operations
+        system_prompt = """You are a STRICT DISASTER MANAGEMENT knowledge base assistant. 
+        You MUST answer user questions ONLY using the provided "Relevant information from knowledge base" context below.
         
-        IMPORTANT: If someone asks about topics NOT related to disaster management, politely decline and redirect them to disaster management topics only.
-        
-        Use the provided context information when relevant to answer disaster management questions accurately."""
+        CRITICAL RULES:
+        1. If the provided context is empty or does not contain the specific answer to the user's question, you MUST politely reply: "I'm sorry, but I don't have information about that in my specific knowledge base. I can only provide answers based on the uploaded disaster management documents." Do NOT try to invent an answer or use your general internet knowledge.
+        2. You ONLY respond to questions strictly related to disaster management. If someone asks about outside topics, politely decline.
+        3. You may briefly respond to basic greetings like "hi" or "hello", but immediately remind the user that you are here to answer questions based on your specific disaster database."""
         
         # Prepare messages for API
         messages = [{"role": "system", "content": system_prompt}]
